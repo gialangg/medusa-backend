@@ -1,21 +1,18 @@
-FROM node:18-alpine AS builder
+# Stage 1: Build
+FROM node:20-alpine AS builder # <-- Sửa thành Node 20
 
 WORKDIR /app
-
-# Copy cả lockfile
 COPY package.json package-lock.json ./
 
-# Cập nhật npm và cài đặt dependencies
-RUN npm install -g npm@latest && \
-    npm ci --production
+# Không cần cập nhật npm vì Node 20 đã đi kèm npm tương thích
+RUN npm ci --production
 
 COPY . .
 RUN npm run build
 
-FROM node:18-alpine
+# Stage 2: Production
+FROM node:20-alpine # <-- Sửa thành Node 20
 WORKDIR /app
-
 COPY --from=builder /app .
-RUN npm install -g @medusajs/medusa-cli
 
 CMD ["sh", "-c", "medusa migrate && medusa start"]
