@@ -2,14 +2,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files và cài đặt dependencies
+# Bước 1: Copy package files và cài đặt dependencies
 COPY package*.json ./
 RUN npm install --include=dev  # Cài đặt cả devDependencies
-RUN npm install -g @medusajs/medusa-cli  # Cài đặt Medusa CLI toàn cục
+RUN npm install @medusajs/medusa-cli  # Cài đặt medusa-cli cục bộ
 
-# Copy mã nguồn và build
+# Bước 2: Copy mã nguồn và build
 COPY . .
 RUN npm run build
 
-# Chạy migrations và khởi động server
-CMD ["sh", "-c", "medusa migrations run && medusa start"]
+# Bước 3: Chạy migrations và khởi động server với npx
+CMD ["sh", "-c", "npx medusa migrations run && npx medusa start"]
