@@ -8,4 +8,5 @@ RUN npm install --legacy-peer-deps  # Fix xung đột dependencies
 COPY . .
 RUN npm run build
 
-CMD ["sh", "-c", "npx medusa migrate && npx medusa start"]  # Lệnh mới
+RUN npm run predeploy 
+RUN npm run start
