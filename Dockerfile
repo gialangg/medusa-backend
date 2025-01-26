@@ -3,7 +3,7 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
-COPY medusa-config.js ./
+COPY medusa-config.ts ./
 
 # Cài đặt cả devDependencies để build
 RUN npm ci
