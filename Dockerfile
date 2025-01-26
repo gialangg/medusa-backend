@@ -4,11 +4,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 
-# Cài đặt cả devDependencies và dotenv
-RUN npm ci --include=dev
-
-# Cài đặt Medusa CLI và dotenv GLOBALLY
-RUN npm install -g @medusajs/medusa-cli dotenv
+# Cài đặt dependencies KHÔNG bao gồm dotenv
+RUN npm ci --production
 
 COPY . .
 RUN npm run build
@@ -17,12 +14,11 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 
-# Copy tất cả dependencies và global modules
 COPY --from=builder /app .
 COPY --from=builder /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=builder /usr/local/bin/medusa /usr/local/bin/medusa
 
-# Cấu hình PATH
+# Cấu hình Environment Variables trực tiếp qua Coolify
 ENV PATH="/usr/local/bin:${PATH}"
 
 CMD ["sh", "-c", "medusa migrate && medusa start"]
