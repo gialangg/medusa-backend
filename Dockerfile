@@ -4,10 +4,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 
-# Cài đặt cả production và dev dependencies
-RUN npm ci
+# Cài đặt cả devDependencies và dotenv
+RUN npm ci --include=dev
 
-# Cài đặt Medusa CLI và dotenv globally
+# Cài đặt Medusa CLI và dotenv GLOBALLY
 RUN npm install -g @medusajs/medusa-cli dotenv
 
 COPY . .
@@ -17,13 +17,10 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 
-# Copy các file cần thiết
+# Copy tất cả dependencies và global modules
 COPY --from=builder /app .
 COPY --from=builder /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=builder /usr/local/bin/medusa /usr/local/bin/medusa
-
-# Copy file .env (nếu có)
-COPY .env ./
 
 # Cấu hình PATH
 ENV PATH="/usr/local/bin:${PATH}"
