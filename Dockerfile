@@ -1,6 +1,5 @@
 # Stage 1: Build
-FROM node:20-alpine AS builder # <-- Sửa thành Node 20
-
+FROM node:20-alpine AS builder 
 WORKDIR /app
 COPY package.json package-lock.json ./
 
@@ -11,7 +10,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production
-FROM node:20-alpine # <-- Sửa thành Node 20
+FROM node:20-alpine 
 WORKDIR /app
 COPY --from=builder /app .
 
