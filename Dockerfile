@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 9000
 
 # Chạy migrations và khởi động server
-CMD ["sh", "-c", "npx medusa migrations run && medusa start"]
+CMD ["sh", "-c", "medusa migrate && medusa start"]
