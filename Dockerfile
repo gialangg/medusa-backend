@@ -1,23 +1,32 @@
-# Sử dụng Node.js 18
-FROM node:18-alpine
+# Stage 1: Build
+FROM node:18-alpine AS builder
 
-# Thiết lập thư mục làm việc
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
+COPY medusa-config.js ./
 
-# Cài đặt dependencies
-RUN npm install --production
+# Cài đặt cả devDependencies để build
+RUN npm ci
 
-# Copy toàn bộ source code
 COPY . .
-
-# Build ứng dụng
 RUN npm run build
 
-# Expose port 9000 (port mặc định của Medusa)
+# Stage 2: Production
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy từ builder
+COPY --from=builder /app .
+COPY --from=builder /app/node_modules ./node_modules  # Quan trọng: Copy node_modules
+
+# Cài đặt Medusa CLI globally
+RUN npm install -g @medusajs/medusa-cli
+
+ENV NODE_ENV=production
+ENV PORT=9000
+
 EXPOSE 9000
 
-# Chạy migrations và khởi động server
-CMD ["sh", "-c", "medusa migrate && medusa start"]
+# Sử dụng full path đến medusa
+CMD ["sh", "-c", "/usr/local/bin/medusa migrate && /usr/local/bin/medusa start"]
